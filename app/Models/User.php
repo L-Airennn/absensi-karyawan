@@ -2,48 +2,68 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
+        'nama',
         'email',
         'password',
+        'role',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // ── Relasi ───────────────────────────────────────────────────────────────
+
+    /** User bisa punya 1 data karyawan */
+    public function karyawan()
+    {
+        return $this->hasOne(Karyawan::class);
+    }
+
+    /** Izin/sakit yang diproses oleh user (admin) ini */
+    public function izinDiproses()
+    {
+        return $this->hasMany(IzinSakit::class, 'diproses_oleh');
+    }
+
+    /** Lembur yang dicatat oleh user (admin) ini */
+    public function lemburDicatat()
+    {
+        return $this->hasMany(Lembur::class, 'dicatat_oleh');
+    }
+
+    /** Penggajian yang digenerate oleh user (admin) ini */
+    public function penggajianDigenerate()
+    {
+        return $this->hasMany(Penggajian::class, 'digenerate_oleh');
+    }
+
+    // ── Helper ───────────────────────────────────────────────────────────────
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isKaryawan(): bool
+    {
+        return $this->role === 'karyawan';
     }
 }
