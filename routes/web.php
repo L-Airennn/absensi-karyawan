@@ -121,3 +121,7 @@ Route::prefix('karyawan')
     Route::get('/slip-gaji',                       [PenggajianController::class, 'slipGaji'])   ->name('slip-gaji.index');
     Route::get('/slip-gaji/{detailPenggajian}',    [PenggajianController::class, 'detailSlip']) ->name('slip-gaji.detail');
 });
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
